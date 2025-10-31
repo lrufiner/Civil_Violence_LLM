@@ -160,8 +160,8 @@ Monitor LLM decisions in the terminal:
 
 The simulation uses a **hybrid approach** for performance:
 
-- **1% of agents** use LLM for decisions (~11 agents per step)
-- **99% of agents** use mathematical rules (instant)
+- **P% of agents** use LLM for decisions (~P*100 agents per step)
+- **100-P% of agents** use mathematical rules (instant)
 - This balance provides LLM examples while maintaining speed
 
 To adjust LLM usage, edit `config.py`:
