@@ -23,12 +23,14 @@ Este proyecto implementa el Modelo 1 del artículo "Modeling civil violence: An 
 ## Instalación
 
 1. Clonar el repositorio:
+
 ```bash
 git clone https://github.com/TU_USUARIO/Civil_Violence_LLM.git
 cd Civil_Violence_LLM
 ```
 
 2. Crear y activar un entorno virtual:
+
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate  # En Linux/Mac
@@ -36,11 +38,13 @@ source .venv/bin/activate  # En Linux/Mac
 ```
 
 3. Instalar dependencias:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. Instalar y configurar Ollama:
+
 ```bash
 # Instalar Ollama desde https://ollama.ai/
 # Descargar el modelo phi3
@@ -104,6 +108,7 @@ Civil_Violence_LLM/
 ## Créditos
 
 Basado en el trabajo original de:
+
 - Epstein, J. M. (2002). "Modeling civil violence: An agent-based computational approach". *Proceedings of the National Academy of Sciences*, 99(suppl 3), 7243-7250.
 
 ## Licencia
@@ -122,8 +127,4 @@ Las contribuciones son bienvenidas. Por favor:
 
 ## Autor
 
-**Lucas Rufiner**
-
-## Problemas conocidos
-
-Para soluciones a problemas técnicos comunes, consulta el archivo [SOLUCIONES.md](SOLUCIONES.md).
+**Juan Aued (modificado por Leonardo Rufiner)**
