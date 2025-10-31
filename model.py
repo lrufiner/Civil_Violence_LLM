@@ -5,6 +5,7 @@ from agents import (
     CitizenState,
     Cop,
 )
+from config import MODEL_PARAMS, DATA_COLLECTION
 
 class EpsteinCivilViolenceLLM(mesa.Model):
     """
@@ -46,6 +47,13 @@ class EpsteinCivilViolenceLLM(mesa.Model):
         self.movement = movement
         self.max_iters = max_iters
         self.steps = 0
+        self._agent_counter = 0
+        
+        # Almacenar parámetros ajustables para actualización dinámica
+        self.legitimacy = legitimacy
+        self.max_jail_term = max_jail_term
+        self.citizen_vision = citizen_vision
+        self.cop_vision = cop_vision
 
         self.grid = mesa.discrete_space.OrthogonalVonNeumannGrid(
             (width, height), capacity=1, torus=True, random=self.random
@@ -59,6 +67,7 @@ class EpsteinCivilViolenceLLM(mesa.Model):
         agent_reporters = {
             "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
             "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
+            "llm_response": lambda a: getattr(a, "llm_response", ""),
         }
         self.datacollector = mesa.DataCollector(
             model_reporters=model_reporters, agent_reporters=agent_reporters
@@ -78,13 +87,7 @@ class EpsteinCivilViolenceLLM(mesa.Model):
                 cop = Cop(self, vision=cop_vision, max_jail_term=max_jail_term)
                 cop.move_to(cell)
             elif klass == CitizenLLM:
-                citizen = CitizenLLM(
-                    self,
-                    regime_legitimacy=legitimacy,
-                    threshold=active_threshold,
-                    vision=citizen_vision,
-                    arrest_prob_constant=arrest_prob_constant,
-                )
+                citizen = CitizenLLM(self, vision=citizen_vision)
                 citizen.move_to(cell)
 
         self.running = True
