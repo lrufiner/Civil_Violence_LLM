@@ -43,10 +43,16 @@ class EpsteinCivilViolenceLLM(mesa.Model):
         max_iters=1000,
         seed=None,
     ):
+        try:
+            seed = int(seed) if seed not in (None, "") else None
+        except (TypeError, ValueError):
+            seed = None
+
         super().__init__(seed=seed)
         self.movement = movement
         self.max_iters = max_iters
         self.steps = 0
+        self.llm_calls = 0
         self._agent_counter = 0
         
         # Almacenar parámetros ajustables para actualización dinámica
@@ -59,18 +65,9 @@ class EpsteinCivilViolenceLLM(mesa.Model):
             (width, height), capacity=1, torus=True, random=self.random
         )
 
-        model_reporters = {
-            "active": CitizenState.ACTIVE.name,
-            "quiet": CitizenState.QUIET.name,
-            "arrested": CitizenState.ARRESTED.name,
-        }
-        agent_reporters = {
-            "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
-            "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
-            "llm_response": lambda a: getattr(a, "llm_response", ""),
-        }
         self.datacollector = mesa.DataCollector(
-            model_reporters=model_reporters, agent_reporters=agent_reporters
+            model_reporters=DATA_COLLECTION["model_reporters"],
+            agent_reporters=DATA_COLLECTION["agent_reporters"],
         )
 
         if cop_density + citizen_density > 1:
@@ -112,7 +109,8 @@ class EpsteinCivilViolenceLLM(mesa.Model):
         """
         Función auxiliar para contar el número de ciudadanos en cada estado.
         """
-        counts = self.agents_by_type[CitizenLLM].groupby("state").count()
+        citizen_table = self.agents_by_type.get(CitizenLLM)
+        counts = citizen_table.groupby("state").count() if citizen_table is not None else {}
 
         for state in CitizenState:
             setattr(self, state.name, counts.get(state, 0))

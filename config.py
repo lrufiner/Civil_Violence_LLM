@@ -13,7 +13,7 @@ LLM_CONFIG = {
     
     # Porcentaje de agentes que consultan al LLM (0.01 = 1%)
     # El resto usa reglas matemáticas simples
-    "llm_usage_rate": 0.2,
+    "llm_usage_rate": 0.03,
     
     # Máximo de palabras en la respuesta del LLM
     "max_response_tokens": 6,
@@ -106,6 +106,8 @@ VISUALIZATION_CONFIG = {
         "arrested": "🔒",
         "llm_decision": "💭",
         "rule_decision": "📐",
+        "active": "🟠",
+        "quiet": "🔵",
     },
 }
 
@@ -116,19 +118,20 @@ VISUALIZATION_CONFIG = {
 DATA_COLLECTION = {
     # Variables a nivel de modelo
     "model_reporters": {
-        "Quiescent": "count_type_citizens",
-        "Active": "count_type_actives",
-        "Jailed": "count_jailed",
+        "quiet_citizens": lambda m: getattr(m, "QUIET", 0),
+        "active_citizens": lambda m: getattr(m, "ACTIVE", 0),
+        "jailed_citizens": lambda m: getattr(m, "ARRESTED", 0),
+        "llm_calls": lambda m: getattr(m, "llm_calls", 0),
     },
-    
+
     # Variables a nivel de agente
     "agent_reporters": {
-        "x": lambda a: a.pos[0] if a.pos else None,
-        "y": lambda a: a.pos[1] if a.pos else None,
-        "breed": lambda a: a.breed,
+        "x": lambda a: a.pos[0] if hasattr(a, "pos") and a.pos else None,
+        "y": lambda a: a.pos[1] if hasattr(a, "pos") and a.pos else None,
+        "state": lambda a: getattr(a, "state", None).name if hasattr(a, "state") else None,
         "jail_sentence": lambda a: getattr(a, "jail_sentence", None),
-        "condition": lambda a: a.condition,
-        "arrest_probability": lambda a: getattr(a, "arrest_probability", None),
+        "hardship": lambda a: getattr(a, "hardship", None),
+        "risk_aversion": lambda a: getattr(a, "risk_aversion", None),
         "llm_response": lambda a: getattr(a, "llm_response", ""),
     },
 }

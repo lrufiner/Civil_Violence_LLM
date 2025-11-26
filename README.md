@@ -12,7 +12,7 @@ This project implements Model 1 from the article "Modeling civil violence: An ag
 - **LLM-powered decisions**: Citizens use Ollama (phi3 model) to decide whether to rebel
 - **Interactive visualization** with [Solara](https://solara.dev/)
 - **Dynamic parameters**: Adjust legitimacy, vision, and jail terms in real-time without restarting
-- **Hybrid approach**: P % of agents use LLM, 100-P % use mathematical rules for performance
+- **Hybrid approach**: P % of agents use LLM, 100-P % use mathematical rules for performance (default **3%**)
 - **Console logging**: Monitor LLM responses with agent IDs and decision factors
 - **Agents**:
   - **Citizens**: Make rebellion decisions based on grievance and risk aversion
@@ -65,6 +65,8 @@ solara run app.py
 
 Then open your browser at: `http://localhost:8765`
 
+> Tip: if Ollama is not available (CI or offline), set `LLM_CONFIG['llm_usage_rate']=0` and `LLM_CONFIG['show_console_output']=False` in `config.py` to rely solely on rule-based decisions.
+
 ### Run in background
 
 ```bash
@@ -83,6 +85,24 @@ Civil_Violence_LLM/
 ├── README.md                    # This file
 └── CONFIG_GUIDE.md              # Configuration guide
 ```
+
+## Quick architecture
+
+```
+solara UI (app.py)
+   ├── controls & live sliders
+   ├── LLM response panel
+   └── Mesa visualizations
+        ↳ EpsteinCivilViolenceLLM (model.py)
+             ├── creates grid, cops, citizens
+             ├── tracks LLM call counter and state counts
+             ├── DataCollector using DATA_COLLECTION config
+             └── delegates decisions to agents (agents.py)
+                  ├── CitizenLLM: math rule or LLM prompt
+                  └── Cop: arrests active citizens
+```
+
+The data pipeline stores per-step counts of quiet/active/jailed citizens and LLM invocations, plus per-agent grievance inputs and responses for downstream analysis.
 
 ## Model Parameters
 
@@ -103,7 +123,7 @@ Civil_Violence_LLM/
 
 ### LLM Configuration (in config.py)
 
-- **`llm_usage_rate`**: Percentage of agents using LLM (default: 1%)
+- **`llm_usage_rate`**: Percentage of agents using LLM (default: 3%)
 - **`model`**: Ollama model to use (default: "phi3")
 - **`max_response_tokens`**: Max words in LLM response (default: 10)
 - **`prompt_template`**: Prompt used for LLM queries

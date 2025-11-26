@@ -61,8 +61,8 @@ def post_process(ax):
 model_params = {
     "seed": {
         "type": "InputText",
-        "value": 42,
-        "label": "Random Seed",
+        "value": "42",
+        "label": "Random Seed (integer)",
     },
     "height": MODEL_PARAMS["height"],
     "width": MODEL_PARAMS["width"],
@@ -161,7 +161,7 @@ def DynamicControls(model):
 @solara.component
 def LLMResponsesDisplay(model):
     """Compact component to display LLM responses"""
-    with solara.Card("💭 LLM (last 3)", elevation=1, 
+    with solara.Card("💭 LLM (last responses)", elevation=1,
                      style={"margin": "10px 0", "padding": "8px"}):
         # Get all citizens with LLM responses
         responses = []
@@ -173,12 +173,13 @@ def LLMResponsesDisplay(model):
                     if isinstance(agent, CitizenLLM):
                         total_citizens += 1
                         if hasattr(agent, 'llm_response') and agent.llm_response:
-                            # Only exclude initial placeholder responses
-                            if agent.llm_response not in ["⏸️ Initial", "⚫ Arrested"]:
-                                estado = "🟠" if agent.active else "🔵"
+                            if agent.llm_response not in [
+                                f"{VISUALIZATION_CONFIG['symbols']['initial']} Initial",
+                                f"{VISUALIZATION_CONFIG['symbols']['arrested']} Arrested",
+                            ]:
+                                estado = VISUALIZATION_CONFIG['symbols']['active'] if agent.active else VISUALIZATION_CONFIG['symbols']['quiet']
                                 if agent.jail_sentence > 0:
-                                    estado = "⚫"
-                                # Add agent ID, grievance and risk info
+                                    estado = VISUALIZATION_CONFIG['symbols']['arrested']
                                 agent_id = agent.unique_id
                                 g = int(agent.grievance * 100)
                                 r = int(agent.risk_aversion * 100)
@@ -191,9 +192,10 @@ def LLMResponsesDisplay(model):
         solara.Text(f"👥 {total_citizens} | 💬 {len(responses)}", 
                    style={"color": "#666", "font-size": "0.7em", "margin-bottom": "5px"})
         
-        # Show only last 3 responses (more compact)
+        max_responses = VISUALIZATION_CONFIG.get("max_llm_responses_display", 5)
+
         if responses:
-            recent = responses[-3:] if len(responses) > 3 else responses
+            recent = responses[-max_responses:] if len(responses) > max_responses else responses
             for item in recent:
                 if len(item) == 3:
                     estado, respuesta, info = item
@@ -222,7 +224,7 @@ renderer.post_process = post_process
 page = SolaraViz(
     epstein_model,
     renderer,
-    components=[chart_component, DynamicControls],
+    components=[chart_component, DynamicControls, LLMResponsesDisplay],
     model_params=model_params,
     name="Epstein Civil Violence (LLM) - Dynamic Parameters",
 )

@@ -6,16 +6,16 @@ from enum import Enum
 import mesa
 
 import subprocess
-import json
 import random
-from config import LLM_CONFIG, AGENT_RULES
+from typing import Optional
+from config import LLM_CONFIG, AGENT_RULES, VISUALIZATION_CONFIG
 
 class CitizenState(Enum):
     ACTIVE = 1
     QUIET = 2
     ARRESTED = 3
 
-def consultar_llm(prompt, model=None, max_tokens=None):
+def consultar_llm(prompt: str, model: Optional[str] = None, max_tokens: Optional[int] = None):
     """
     Consulta al LLM con un límite de tokens en la respuesta.
     Usa configuración de config.py si no se especifican parámetros.
@@ -26,24 +26,30 @@ def consultar_llm(prompt, model=None, max_tokens=None):
         max_tokens = LLM_CONFIG["max_response_tokens"]
     
     try:
-        # Agregar instrucción explícita para respuesta corta
         prompt_mejorado = f"{prompt}\n\nRespuesta (máximo {max_tokens} palabras):"
-        
+
         result = subprocess.run(
-            ["ollama", "run", model, "--verbose"],
+            ["ollama", "run", model],
             input=prompt_mejorado.encode("utf-8"),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            timeout=LLM_CONFIG["timeout"]
+            timeout=LLM_CONFIG["timeout"],
         )
+
+        if result.returncode != 0:
+            if LLM_CONFIG["show_console_output"]:
+                print(
+                    f"Error al consultar LLM (code {result.returncode}): {result.stderr.decode('utf-8').strip()}"
+                )
+            return "no"
+
         output = result.stdout.decode("utf-8").strip().lower()
-        
-        # Limitar la longitud de la respuesta a las primeras N palabras
+
         palabras = output.split()
         if len(palabras) > max_tokens:
-            output = ' '.join(palabras[:max_tokens])
-        
-        return output
+            output = " ".join(palabras[:max_tokens])
+
+        return output or "no"
     except Exception as e:
         if LLM_CONFIG["show_console_output"]:
             print(f"Error al consultar LLM: {e}")
@@ -78,7 +84,7 @@ class CitizenLLM(EpsteinAgent):
         self.active = False
         self.jail_sentence = 0
         self.state = CitizenState.QUIET  # Estado inicial
-        self.llm_response = "⏸️ Inicial"  # Almacena la última respuesta del LLM
+        self.llm_response = f"{VISUALIZATION_CONFIG['symbols']['initial']} Initial"  # Almacena la última respuesta del LLM
     
     @property
     def grievance(self):
@@ -93,7 +99,7 @@ class CitizenLLM(EpsteinAgent):
             self.jail_sentence -= 1
             self.active = False
             self.state = CitizenState.ARRESTED
-            self.llm_response = "🔒 Arrestado"
+            self.llm_response = f"{VISUALIZATION_CONFIG['symbols']['arrested']} Arrested"
             return
         
         # Actualizar visión si cambió en el modelo
@@ -120,17 +126,19 @@ class CitizenLLM(EpsteinAgent):
             if LLM_CONFIG["show_console_output"]:
                 print(f"🤖 Agent {self.unique_id} | G:{grievance_pct}% R:{risk_aversion_pct}% | LLM responded: '{respuesta}'")
             
-            self.llm_response = f"💭 LLM: {respuesta[:20]}"  # Mark that it used LLM
+            self.llm_response = f"{VISUALIZATION_CONFIG['symbols']['llm_decision']} LLM: {respuesta[:20]}"  # Mark that it used LLM
             
             # Detect affirmative response using keywords from configuration
             respuesta_lower = respuesta.lower()
             self.active = any(keyword in respuesta_lower for keyword in LLM_CONFIG["affirmative_keywords"])
+            if self.model is not None:
+                self.model.llm_calls += 1
         else:
             # Most agents use simple mathematical rule (faster)
             threshold = AGENT_RULES["rebellion_threshold"]
             self.active = self.grievance > (self.risk_aversion + threshold)
             decision = "yes" if self.active else "no"
-            self.llm_response = f"📐 Rule: {decision}"
+            self.llm_response = f"{VISUALIZATION_CONFIG['symbols']['rule_decision']} Rule: {decision}"
         
         # Update state according to decision
         if self.active:
