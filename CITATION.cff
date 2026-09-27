@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Civil Violence LLM: Epstein's civil violence model with LLM-driven citizens"
+authors:
+  - family-names: Aued
+    given-names: Juan
+  - family-names: Rufiner
+    given-names: Hugo Leonardo
+license: MIT
+repository-code: "https://github.com/lrufiner/Civil_Violence_LLM"
+keywords:
+  - agent-based modeling
+  - civil violence
+  - Epstein model
+  - large language models
+  - Mesa
+references:
+  - type: article
+    authors:
+      - family-names: Epstein
+        given-names: Joshua M.
+    title: "Modeling civil violence: An agent-based computational approach"
+    journal: "Proceedings of the National Academy of Sciences"
+    volume: 99
+    issue: "suppl 3"
+    start: 7243
+    end: 7250
+    year: 2002
+    doi: "10.1073/pnas.092080199"

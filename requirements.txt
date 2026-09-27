@@ -1,0 +1,25 @@
+mesa==3.5.1
+solara>=1.24,<2.0
+matplotlib>=3.8,<4.0
+networkx>=3.2,<4.0
+altair>=5.0
+ipywidgets>=8.0.0
+jupyter>=1.0.0
+pandas>=2.0
+
+# LLM / LangChain multi-proveedor (LangChain 1.x)
+langchain>=1.0,<2.0
+langchain-core>=1.6.2,<2.0
+langchain-openai>=1.0,<2.0
+langchain-anthropic>=1.0,<2.0
+langchain-ollama>=1.0,<2.0
+
+# Motor de decisión Jev (TypeSafe AI System One) - paquete todavía en alpha
+langchain-typesafe>=0.0.1a1
+
+# Configuración y validación
+python-dotenv>=1.0
+pydantic>=2.0
+
+# Testing
+pytest>=8.0
