@@ -1,7 +1,7 @@
 # Civil Violence LLM
 
 [![Tests](https://github.com/lrufiner/Civil_Violence_LLM/actions/workflows/tests.yml/badge.svg)](https://github.com/lrufiner/Civil_Violence_LLM/actions/workflows/tests.yml)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/)
 [![Mesa 3.5](https://img.shields.io/badge/Mesa-3.5-orange.svg)](https://mesa.readthedocs.io/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -35,12 +35,12 @@ A typical run, narrated in Spanish (2 min): the hybrid engine with Jev, an outbu
 
 ## Quick start
 
-Requires Python 3.11+.
+Requires Python 3.12+.
 
 ```bash
 git clone https://github.com/lrufiner/Civil_Violence_LLM.git
 cd Civil_Violence_LLM
-python3.11 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
