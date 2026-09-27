@@ -1,6 +1,8 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "Civil Violence LLM: Epstein's civil violence model with LLM-driven citizens"
+version: 1.0.0
+date-released: 2026-09-27
 authors:
   - family-names: Aued
     given-names: Juan
